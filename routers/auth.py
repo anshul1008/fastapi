@@ -1,12 +1,17 @@
+from telnetlib import STATUS
 from fastapi import APIRouter, Depends
 from models import Users
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import SessionLocal
 from typing import Annotated
+from passlib.context import CryptContext
+from starlette import status
 
 # Get fastapi instance
 router = APIRouter()
+
+bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 # Pydantic validation for user request
 class CreateUserRequest(BaseModel):
@@ -27,7 +32,7 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
-@router.post('/signin')
+@router.post('/signin', status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,
                       create_user_request: CreateUserRequest):
     create_user_model = Users(
@@ -36,7 +41,7 @@ async def create_user(db: db_dependency,
         first_name= create_user_request.first_name,
         last_name= create_user_request.last_name,
         role= create_user_request.role,
-        hashed_password= create_user_request.password,
+        hashed_password= bcrypt_context.hash(create_user_request.password),
         is_active=True
     )
 
