@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updating new changes for next version
 
+## [v6]
+
+### Added - Authentication
+
+- Added user model connecting to specific todos records
+- Added signin route to create user with hashed password
+- Added login route to authenticate user
+- Added get current user route to verify the token generated to get user details
+- Checked all routes on the swagger docs
+
 ## [v5]
 
 ### Restructuring - Add support for multiple router files
@@ -49,7 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial Commit
 
-[unreleased]: https://github.com/deepak0023/fastapi/compare/v5...HEAD
+[unreleased]: https://github.com/deepak0023/fastapi/compare/v6...HEAD
+[v6]: https://github.com/deepak0023/fastapi/compare/v5...v6
 [v5]: https://github.com/deepak0023/fastapi/compare/v4...v5
 [v4]: https://github.com/deepak0023/fastapi/compare/v3...v4
 [v3]: https://github.com/deepak0023/fastapi/compare/v2...v3
