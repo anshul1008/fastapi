@@ -27,6 +27,10 @@ class CreateUserRequest(BaseModel):
     password: str
     role: str
 
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
 # Get db connection for CRUD operation
 def get_db():
     db = SessionLocal()
@@ -67,9 +71,10 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
-@router.post("/login")
+@router.post("/login", response_model=Token)
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
     auth = authenticate_user(form_data.username, form_data.password, db)
     if not auth:
         return "failed"
-    return create_access_token(auth.username, auth.id, timedelta(minutes=20))
+    token = create_access_token(auth.username, auth.id, timedelta(minutes=20))
+    return {'access_token': token, 'token_type': 'bearer'}
