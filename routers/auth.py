@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from models import Users
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -6,8 +6,8 @@ from database import SessionLocal
 from typing import Annotated
 from passlib.context import CryptContext
 from starlette import status
-from fastapi.security import OAuth2PasswordRequestForm
-from jose import jwt
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from jose import jwt, JWTError
 from datetime import timedelta, datetime, timezone
 
 # Get fastapi instance
@@ -17,6 +17,7 @@ SECRET_KEY = '6442318aefd6abfad912c4c373769ea6bfbdabeaaa98063c3e4bd118edb50200'
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='/login')
 
 # Pydantic validation for user request
 class CreateUserRequest(BaseModel):
@@ -75,6 +76,18 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
     auth = authenticate_user(form_data.username, form_data.password, db)
     if not auth:
-        return "failed"
+        raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
     token = create_access_token(auth.username, auth.id, timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
+
+@router.get("/get_current_user")
+async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get('sub')
+        user_id: int = payload.get('id')
+        if username is None or user_id is None:
+            raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
+        return {'username': username, 'user_id': user_id}
+    except JWTError:
+        raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
