@@ -11,7 +11,10 @@ from jose import jwt, JWTError
 from datetime import timedelta, datetime, timezone
 
 # Get fastapi instance
-router = APIRouter()
+router = APIRouter(
+    prefix='/auth',
+    tags=['auth']
+)
 
 SECRET_KEY = '6442318aefd6abfad912c4c373769ea6bfbdabeaaa98063c3e4bd118edb50200'
 ALGORITHM = 'HS256'
@@ -42,6 +45,7 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 
+# user signin / add user
 @router.post('/signin', status_code=status.HTTP_201_CREATED)
 async def create_user(db: db_dependency,
                       create_user_request: CreateUserRequest):
@@ -72,6 +76,7 @@ def create_access_token(username: str, user_id: int, expires_delta: timedelta):
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
+# authenticate user with username and password and generate and return jwt token
 @router.post("/login", response_model=Token)
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: db_dependency):
     auth = authenticate_user(form_data.username, form_data.password, db)
@@ -80,6 +85,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     token = create_access_token(auth.username, auth.id, timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
 
+# use the jwt token generated to access user details from specific claims
 @router.get("/get_current_user")
 async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
     try:
