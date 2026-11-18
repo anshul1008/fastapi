@@ -5,6 +5,7 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from starlette import status
 from pydantic import BaseModel, Field
+from .auth import get_current_user
 
 # Get fastapi instance
 router = APIRouter()
@@ -18,6 +19,7 @@ def get_db():
         db.close()
 
 db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(get_current_user)]
 
 class TodoRequest(BaseModel):
     title: str = Field(min_length = 3)
@@ -39,9 +41,11 @@ async def read_todo(db: db_dependency, todo_id: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail='Todo not found.')
 
 @router.post('/todo', status_code=status.HTTP_201_CREATED)
-async def create_todo(db: db_dependency, todo_request: TodoRequest):
+async def create_todo(db: db_dependency, todo_request: TodoRequest, user: user_dependency):
+    if user is None:
+        raise HTTPException(status_code=401, detail="Authentication failed")
     # Get required data from request and add a new todo record
-    todo_model = Todos(**todo_request.model_dump())
+    todo_model = Todos(**todo_request.model_dump(), owner_id=user.get('user_id'))
     db.add(todo_model)
     db.commit()
 
