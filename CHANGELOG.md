@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updating new changes for next version
 
+## [v8]
+
+### Fix - Admin access to all todo records
+
+- Allow admin to make crud operations on all todo records based on user authentication
+- Checked todos routes authentication with admin role with swagger docs
+
 ## [v7]
 
 ### Added - Todo endpoint authentication
@@ -66,7 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial Commit
 
-[unreleased]: https://github.com/deepak0023/fastapi/compare/v7...HEAD
+[unreleased]: https://github.com/deepak0023/fastapi/compare/v8...HEAD
+[v8]: https://github.com/deepak0023/fastapi/compare/v7...v8
 [v7]: https://github.com/deepak0023/fastapi/compare/v6...v7
 [v6]: https://github.com/deepak0023/fastapi/compare/v5...v6
 [v5]: https://github.com/deepak0023/fastapi/compare/v4...v5
