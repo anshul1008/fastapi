@@ -70,8 +70,8 @@ def authenticate_user(username: str, password: str, db):
         return False
     return user
 
-def create_access_token(username: str, user_id: int, expires_delta: timedelta):
-    encode = {'sub': username, 'id': user_id}
+def create_access_token(username: str, user_id: int, expires_delta: timedelta, role: str):
+    encode = {'sub': username, 'id': user_id, 'role': role}
     expires = datetime.now(timezone.utc) + expires_delta
     encode.update({'exp': expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
@@ -82,7 +82,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     auth = authenticate_user(form_data.username, form_data.password, db)
     if not auth:
         raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
-    token = create_access_token(auth.username, auth.id, timedelta(minutes=20))
+    token = create_access_token(auth.username, auth.id, auth.role, timedelta(minutes=20))
     return {'access_token': token, 'token_type': 'bearer'}
 
 # use the jwt token generated to access user details from specific claims
@@ -92,8 +92,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('sub')
         user_id: int = payload.get('id')
+        role: str = payload.get('role')
         if username is None or user_id is None:
             raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
-        return {'username': username, 'user_id': user_id}
+        return {'username': username, 'user_id': user_id, 'user_role': role}
     except JWTError:
         raise HTTPException(status_code= status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
