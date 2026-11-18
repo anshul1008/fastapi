@@ -20,7 +20,7 @@ SECRET_KEY = '6442318aefd6abfad912c4c373769ea6bfbdabeaaa98063c3e4bd118edb50200'
 ALGORITHM = 'HS256'
 
 bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='/login')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='/auth/login')
 
 # Pydantic validation for user request
 class CreateUserRequest(BaseModel):
