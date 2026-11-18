@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updating new changes for next version
 
+## [v7]
+
+### Added - Todo endpoint authentication
+
+- Allow only owner of the todo to make crud operations based on user authentication
+- Checked todos routes authentication on the swagger docs
+
 ## [v6]
 
 ### Added - Authentication
@@ -59,7 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial Commit
 
-[unreleased]: https://github.com/deepak0023/fastapi/compare/v6...HEAD
+[unreleased]: https://github.com/deepak0023/fastapi/compare/v7...HEAD
+[v7]: https://github.com/deepak0023/fastapi/compare/v6...v7
 [v6]: https://github.com/deepak0023/fastapi/compare/v5...v6
 [v5]: https://github.com/deepak0023/fastapi/compare/v4...v5
 [v4]: https://github.com/deepak0023/fastapi/compare/v3...v4
